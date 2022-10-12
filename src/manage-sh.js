@@ -20,7 +20,6 @@ export function createSh(path) {
       const content = `
         #!/usr/bin/env bash
 
-        cd ${path}
         mkdir -p ${json.source}
 
         ${
@@ -31,7 +30,7 @@ export function createSh(path) {
             git fetch ${dependency.value.link} && git checkout ${dependency.value.version}
             git pull ${dependency.value.link} ${dependency.value.version}
             ${ dependency.value.commands || "" }
-            cd ${path}
+            cd ..
           `.trim()).join("\n\n")
         }
       `.trim().replace(/\s+$/gm, "").replace(/^\s+/gm, "");
