@@ -18,5 +18,8 @@
     "path": "^0.12.7",
     "readline": "^1.3.0",
     "yargs": "^17.6.0"
+  },
+  "bin": {
+    "ugdm": "./src/index.js"
   }
 }
