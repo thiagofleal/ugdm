@@ -3,6 +3,7 @@
 import { createInterface } from "readline";
 import yargs from "yargs";
 import { ManageJSON } from "./manage-json.js";
+import { createSh } from "./manage-sh.js";
 
 const PATH = process.cwd();
 
@@ -73,5 +74,5 @@ if (options.r) {
 	remove(options.r);
 }
 if (options.b) {
-	// Build
+	createSh(PATH);
 }

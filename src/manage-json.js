@@ -1,10 +1,12 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 
+import { jsonFileName } from "./const.js";
+
 export class ManageJSON {
   constructor(path) {
     this.path = path || __dirname;
-    this.file = "dependencies.json";
+    this.file = jsonFileName;
     this.fileName = join(this.path, this.file);
     this.content = {};
   }
