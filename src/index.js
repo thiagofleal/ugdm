@@ -46,10 +46,11 @@ const jsonManager = new ManageJSON(PATH);
 
 async function add(name) {
 	const link = await read("Input the repository link: ");
-	const version = (await read("Input the version to use (master): ")) || "master";
+	const version = (await read("Input the version to use [master]: ")) || "master";
+	const commands = (await read("Input the commands to run at install []: ")) || "";
 
 	jsonManager.load();
-	jsonManager.setDependency(name, link, version);
+	jsonManager.setDependency(name, link, version, commands);
 	jsonManager.save();
 }
 

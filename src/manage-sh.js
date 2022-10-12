@@ -30,6 +30,7 @@ export function createSh(path) {
             cd ${dependency.key}
             git fetch ${dependency.value.link} && git checkout ${dependency.value.version}
             git pull ${dependency.value.link} ${dependency.value.version}
+            ${ dependency.value.commands || "" }
             cd ${path}
           `.trim()).join("\n\n")
         }

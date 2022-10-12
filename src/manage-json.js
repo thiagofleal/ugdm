@@ -26,11 +26,11 @@ export class ManageJSON {
     this.content.source = source;
   }
 
-  setDependency(name, link, version) {
+  setDependency(name, link, version, commands) {
     if (!this.content.dependencies) {
       this.content.dependencies = Object.create(null);
     }
-    this.content.dependencies[name] = { link, version };
+    this.content.dependencies[name] = { link, version, commands };
   }
 
   removeDependency(name) {
