@@ -1,5 +1,6 @@
 import { createInterface } from "readline";
-import { jsonManager } from "./consts.js";
+import { jsonManager, PATH } from "./consts.js";
+import { exec } from "./exec.js";
 
 function read(message) {
 	const input = createInterface({
@@ -20,5 +21,24 @@ export async function add(name, link, version, commands) {
 	jsonManager.load();
 	jsonManager.setDependency(name, link, version, commands || "");
 	jsonManager.save();
-  console.log(`Package added: ${ name }:"${ link }"@${ version }`);
+
+	const path = jsonManager.load().getSourcePath().split("/");
+	let mkdirPath = "";
+
+	try {
+		for (let i = 0; i < path.length; i++) {
+			mkdirPath += `${ path[i] }/`
+			await exec(`mkdir -p ${ mkdirPath }`);
+		}
+		await exec(`git clone ${ link } ${ name } && cd ${ name } && git checkout ${ version }`, {
+			cwd: `${ PATH }/${ jsonManager.getSourcePath() }`
+		});
+		console.log(`Package added: ${ name }:"${ link }"@${ version }`);
+	} catch (e) {
+		await exec(`rm -rf ${ name }`, {
+			cwd: `${ PATH }/${ jsonManager.getSourcePath() }`
+		});
+		console.error(`Failed to add: ${ name }:"${ link }"@${ version }`);
+		process.exit(1);
+	}
 }

@@ -16,6 +16,7 @@ export class ManageJSON {
       const content = readFileSync(this.fileName);
       this.content = JSON.parse(content)
     }
+    return this;
   }
 
   save() {
@@ -37,5 +38,9 @@ export class ManageJSON {
     if (this.content.dependencies) {
       delete this.content.dependencies[name];
     }
+  }
+
+  getSourcePath() {
+    return this.content ? this.content.source || "" : "";
   }
 }
