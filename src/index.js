@@ -34,7 +34,7 @@ yargs(hideBin(process.argv))
 			type: "string"
 		}
 	}, args => {
-		add(args.name, args.link, args.version, args.commands);
+		add(args.name, args.link, args["checkout-version"], args.commands);
 	})
 	.command("remove [name]", "Remove GIT dependency", {}, args => {
 		remove(args.name);
