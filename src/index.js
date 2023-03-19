@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-import { createInterface } from "readline";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { init, add, remove, build } from "./modules/index.js";
