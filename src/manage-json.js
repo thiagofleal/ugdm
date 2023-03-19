@@ -19,7 +19,7 @@ export class ManageJSON {
   }
 
   save() {
-    writeFileSync(this.fileName, JSON.stringify(this.content));
+    writeFileSync(this.fileName, JSON.stringify(this.content, null, 2));
   }
 
   init(source) {
