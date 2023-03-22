@@ -16,26 +16,31 @@ export class ManageJSON {
       const content = readFileSync(this.fileName);
       this.content = JSON.parse(content)
     }
+    return this;
   }
 
   save() {
-    writeFileSync(this.fileName, JSON.stringify(this.content));
+    writeFileSync(this.fileName, JSON.stringify(this.content, null, 2));
   }
 
   init(source) {
     this.content.source = source;
   }
 
-  setDependency(name, link, version, commands) {
+  setDependency(name, link, version, commit, commands) {
     if (!this.content.dependencies) {
       this.content.dependencies = Object.create(null);
     }
-    this.content.dependencies[name] = { link, version, commands };
+    this.content.dependencies[name] = { link, version, commit, commands };
   }
 
   removeDependency(name) {
     if (this.content.dependencies) {
       delete this.content.dependencies[name];
     }
+  }
+
+  getSourcePath() {
+    return this.content ? this.content.source || "" : "";
   }
 }
