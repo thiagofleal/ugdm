@@ -19,8 +19,6 @@ export async function add(name, link, version, commands) {
 
   console.log(`Adding package "${ name }:'${ link }'@${ version }"...`);
 	jsonManager.load();
-	jsonManager.setDependency(name, link, version, commands || "");
-	jsonManager.save();
 
 	const path = jsonManager.load().getSourcePath().split("/");
 	let mkdirPath = "";
@@ -33,6 +31,12 @@ export async function add(name, link, version, commands) {
 		await exec(`git clone ${ link } ${ name } && cd ${ name } && git checkout ${ version }`, {
 			cwd: `${ PATH }/${ jsonManager.getSourcePath() }`
 		});
+		const ret = await exec("git log --format=\"%H\" -n 1", {
+			cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
+		});
+		const commit = ret.stdout.toString().trim();
+		jsonManager.setDependency(name, link, version, commit, commands || "");
+		jsonManager.save();
 		console.log(`Package added: ${ name }:"${ link }"@${ version }`);
 	} catch (e) {
 		await exec(`rm -rf ${ name }`, {
