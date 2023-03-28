@@ -1,3 +1,4 @@
+import { existsSync, mkdirSync } from "fs";
 import { createInterface } from "readline";
 import { jsonManager, PATH } from "./consts.js";
 import { exec } from "./exec.js";
@@ -25,13 +26,18 @@ export async function add(name, link, version, commands) {
 
 	try {
 		for (let i = 0; i < path.length; i++) {
-			mkdirPath += `${ path[i] }/`
-			await exec(`mkdir -p ${ mkdirPath }`);
+			mkdirPath += `${ path[i] }/`;
+			if (!existsSync(mkdirPath)) {
+				mkdirSync(mkdirPath);
+			}
 		}
-		await exec(`git clone ${ link } ${ name } && cd ${ name } && git checkout ${ version }`, {
+		await exec(`git clone ${ link } ${ name }`, {
 			cwd: `${ PATH }/${ jsonManager.getSourcePath() }`
 		});
-		const ret = await exec("git log --format=\"%H\" -n 1", {
+		await exec(`git checkout ${ version }`, {
+			cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
+		});
+		const ret = await exec("git rev-parse HEAD", {
 			cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
 		});
 		const commit = ret.stdout.toString().trim();
