@@ -49,7 +49,6 @@ export async function install() {
       console.log(`Package installed: ${ name }:"${ link }"@${ version }`);
     }));
 	} catch (e) {
-    console.error(e);
 		console.error(`Failed to install dependencies`);
 		process.exit(1);
 	}

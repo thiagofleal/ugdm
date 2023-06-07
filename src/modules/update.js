@@ -7,8 +7,6 @@ export async function update(name) {
 	jsonManager.load();
 
 	const path = jsonManager.load().getSourcePath().split("/");
-
-  console.log(jsonManager.content.dependencies[name]);
   
 	try {
     const content = jsonManager.content.dependencies[name];
@@ -40,7 +38,6 @@ export async function update(name) {
       console.log(`Package installed: ${ name }:"${ link }"@${ version }`);
     }
 	} catch (e) {
-    console.error(e);
 		console.error(`Failed to update dependency "${ name }"`);
 		process.exit(1);
 	}
