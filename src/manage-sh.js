@@ -7,7 +7,7 @@ import { jsonManager } from "./modules/consts.js";
 const filename = jsonFileName;
 const shFile = shFileName;
 
-function getArrayFromObject(obj) {
+export function getArrayFromObject(obj) {
   return Object.keys(obj).map(key => ({ key, value: obj[key] }));
 }
 
@@ -19,7 +19,7 @@ export function createSh(path) {
       const json = JSON.parse(readFileSync(file));
       const path = jsonManager.load().getSourcePath().split("/");
       let mkdirPath = "";
-    
+
       const mkdir = path.map((_, i) => {
         mkdirPath += `${ path[i] }/`;
         return path[i] ? `mkdir -p ${ mkdirPath }` : "";
