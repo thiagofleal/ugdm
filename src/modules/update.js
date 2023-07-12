@@ -26,7 +26,7 @@ export async function update(name) {
           cwd: `${ PATH }/${ jsonManager.getSourcePath() }`
         });
       }
-      await exec(`git checkout ${ version }`, {
+      await exec(`git reset --hard && git fetch ${ link } && git pull && git checkout ${ version }`, {
         cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
       });
       const ret = await exec("git rev-parse HEAD", {
