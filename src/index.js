@@ -45,8 +45,8 @@ yargs(hideBin(process.argv))
 	.command("update [name]", "Update dependency version", {}, args => {
 		update(args.name);
 	})
-	.command("build", "Generate shell script to install dependencies", {}, args => {
-		build();
+	.command("build [type]", "Generate shell script to install dependencies", {}, args => {
+		build(args.type);
 	})
 	.command("config", "Configure environment", {}, args => {})
 	.argv;
