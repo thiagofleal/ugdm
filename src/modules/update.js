@@ -26,7 +26,10 @@ export async function update(name) {
           cwd: `${ PATH }/${ jsonManager.getSourcePath() }`
         });
       }
-      await exec(`git checkout ${ version }`, {
+      await exec(`git reset --hard`, {
+        cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
+      });
+      await exec(`git checkout ${ version } && git fetch ${ link } && git pull`, {
         cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
       });
       const ret = await exec("git rev-parse HEAD", {
@@ -38,6 +41,7 @@ export async function update(name) {
       console.log(`Package installed: ${ name }:"${ link }"@${ version }`);
     }
 	} catch (e) {
+    console.error(e);
 		console.error(`Failed to update dependency "${ name }"`);
 		process.exit(1);
 	}

@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync } from "fs";
-import { getArrayFromObject } from "../manage-sh.js";
+import { getArrayFromObject } from "../manage-script.js";
 import { PATH, jsonManager } from "./consts.js";
 import { exec } from "./exec.js";
 
