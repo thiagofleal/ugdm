@@ -72,7 +72,7 @@ export function createWindows(path) {
       const mkdir = path.map((_, i) => {
         mkdirPath += `${ path[i] }`;
         const ret = path[i] ? `IF NOT EXIST ${ mkdirPath } @MKDIR ${ mkdirPath }` : "";
-        mkdirPath += "/";
+        mkdirPath += "\\";
         return ret;
       }).filter(e => e);
 
@@ -84,12 +84,12 @@ export function createWindows(path) {
         ${
           getArrayFromObject(json.dependencies || {}).map(dependency => `
             CD ${ json.source }
-            git clone ${ dependency.value.link } ${ dependency.key }
+            CALL git clone ${ dependency.value.link } ${ dependency.key }
             CD ${ dependency.key }
-            git fetch ${ dependency.value.link }
-            git checkout ${ dependency.value.version }
-            git pull ${ dependency.value.link } ${ dependency.value.version }
-            git checkout ${ dependency.value.commit }
+            CALL git fetch ${ dependency.value.link }
+            CALL git checkout ${ dependency.value.version }
+            CALL git pull ${ dependency.value.link } ${ dependency.value.version }
+            CALL git checkout ${ dependency.value.commit }
             ${ getCommands("windows", dependency) }
             CD ${ mkdir.map(_ => "..").join("/") }
           `.trim()).join("\n\n")
