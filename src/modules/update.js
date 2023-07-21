@@ -35,6 +35,20 @@ export async function update(name) {
       const ret = await exec("git rev-parse HEAD", {
         cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
       });
+      if (commands) {
+        let cmd = null;
+
+        if (typeof commands === "string") {
+          cmd = commands;
+        } else if (commands[process.platform]) {
+          cmd = commands[process.platform]
+        }
+        if (cmd) {
+          await exec(cmd, {
+            cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
+          });
+        }
+      }
       const commit = ret.stdout.toString().trim();
       jsonManager.setDependency(name, link, version, commit, commands || "");
       jsonManager.save();

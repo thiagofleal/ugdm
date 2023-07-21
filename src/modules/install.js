@@ -8,8 +8,8 @@ export async function install() {
 	jsonManager.load();
 
 	const path = jsonManager.getSourcePath().split("/");
-  
-	try {
+
+  try {
     await Promise.all(getArrayFromObject(jsonManager.content.dependencies).map(async e => {
       const name = e.key;
       let { link, version, commit, commands } = e.value;
@@ -40,9 +40,18 @@ export async function install() {
         commit = ret.stdout.toString().trim();
       }
       if (commands) {
-        await exec(commands, {
-          cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
-        });
+        let cmd = null;
+
+        if (typeof commands === "string") {
+          cmd = commands;
+        } else if (commands[process.platform]) {
+          cmd = commands[process.platform]
+        }
+        if (cmd) {
+          await exec(cmd, {
+            cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
+          });
+        }
       }
       jsonManager.setDependency(name, link, version, commit, commands || "");
       jsonManager.save();
