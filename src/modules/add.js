@@ -41,6 +41,21 @@ export async function add(name, link, version, commands) {
 			cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
 		});
 		const commit = ret.stdout.toString().trim();
+
+		if (commands) {
+			let cmd = null;
+
+			if (typeof commands === "string") {
+				cmd = commands;
+			} else if (commands[process.platform]) {
+				cmd = commands[process.platform]
+			}
+			if (cmd) {
+				await exec(cmd, {
+					cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
+				});
+			}
+		}
 		jsonManager.setDependency(name, link, version, commit, commands || "");
 		jsonManager.save();
 		console.log(`Package added: ${ name }:"${ link }"@${ version }`);
