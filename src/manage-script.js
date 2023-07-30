@@ -58,7 +58,10 @@ export async function createLinux(path) {
         `.trim().replace(/\s+$/gm, "").replace(/^\s+/gm, "");
 
         writeFileSync(shFile, content);
-        await exec(`chmod +x ${ shFile }`);
+
+        if (process.platform === "linux") {
+          await exec(`chmod +x ${ shFile }`);
+        }
       }
     }
   } catch (e) {
@@ -70,24 +73,24 @@ export function createWindows(path) {
   try {
     if (existsSync(path)) {
       const file = join(path, filename);
-  
+
       if (existsSync(file)) {
         const json = JSON.parse(readFileSync(file));
         const path = jsonManager.load().getSourcePath().split("/");
         let mkdirPath = "";
-  
+
         const mkdir = path.map((_, i) => {
           mkdirPath += `${ path[i] }`;
           const ret = path[i] ? `IF NOT EXIST ${ mkdirPath } @MKDIR ${ mkdirPath }` : "";
           mkdirPath += "\\";
           return ret;
         }).filter(e => e);
-  
+
         const content = `
           echo off
-  
+
           ${ mkdir.join("\n") }
-  
+
           ${
             getArrayFromObject(json.dependencies || {}).map(dependency => `
               CD ${ json.source }
@@ -102,7 +105,7 @@ export function createWindows(path) {
             `.trim()).join("\n\n")
           }
         `.trim().replace(/\s+$/gm, "").replace(/^\s+/gm, "");
-  
+
         writeFileSync(batchFile, content);
       }
     }

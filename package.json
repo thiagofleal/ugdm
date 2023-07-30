@@ -1,6 +1,6 @@
 {
   "name": "ugdm",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Universal GIT Dependency Manager",
   "main": "src/index.js",
   "type": "module",

@@ -2,6 +2,7 @@ import { existsSync, mkdirSync } from "fs";
 import { createInterface } from "readline";
 import { jsonManager, PATH } from "./consts.js";
 import { exec } from "./exec.js";
+import { installPackage } from "./install-package.js";
 
 function read(message) {
 	const input = createInterface({
@@ -19,7 +20,6 @@ export async function add(name, link, version, commands) {
 	if (!version) version = (await read("Input the version to use [master]: ")) || "master";
 
   console.log(`Adding package "${ name }:'${ link }'@${ version }"...`);
-	jsonManager.load();
 
 	const path = jsonManager.load().getSourcePath().split("/");
 	let mkdirPath = "";
@@ -31,38 +31,14 @@ export async function add(name, link, version, commands) {
 				mkdirSync(mkdirPath);
 			}
 		}
-		await exec(`git clone ${ link } ${ name }`, {
-			cwd: `${ PATH }/${ jsonManager.getSourcePath() }`
-		});
-		await exec(`git checkout ${ version }`, {
-			cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
-		});
-		const ret = await exec("git rev-parse HEAD", {
-			cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
-		});
-		const commit = ret.stdout.toString().trim();
-
-		if (commands) {
-			let cmd = null;
-
-			if (typeof commands === "string") {
-				cmd = commands;
-			} else if (commands[process.platform]) {
-				cmd = commands[process.platform]
-			}
-			if (cmd) {
-				await exec(cmd, {
-					cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
-				});
-			}
-		}
+		const commit = await installPackage(name, link, version, commands);
 		jsonManager.setDependency(name, link, version, commit, commands || "");
 		jsonManager.save();
 		console.log(`Package added: ${ name }:"${ link }"@${ version }`);
 	} catch (e) {
 		await exec(`rm -rf ${ name }`, {
 			cwd: `${ PATH }/${ jsonManager.getSourcePath() }`
-		});
+		}).catch(() => null);
 		console.error(`Failed to add: ${ name }:"${ link }"@${ version }`);
 		process.exit(1);
 	}
