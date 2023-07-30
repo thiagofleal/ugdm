@@ -1,44 +1,30 @@
 import { existsSync, mkdirSync } from "fs";
-import { PATH, jsonManager } from "./consts.js";
-import { exec } from "./exec.js";
+import { jsonManager } from "./consts.js";
+import { installPackage } from "./install-package.js";
 
 export async function update(name) {
   console.log(`Updating "${ name }"...`);
 	jsonManager.load();
 
 	const path = jsonManager.load().getSourcePath().split("/");
-  
+
 	try {
     const content = jsonManager.content.dependencies[name];
 
     if (content) {
       const { link, version, commands } = content;
       let mkdirPath = "";
-  
+
       for (let i = 0; i < path.length; i++) {
         mkdirPath += `${ path[i] }/`;
         if (!existsSync(mkdirPath)) {
           mkdirSync(mkdirPath);
         }
       }
-      if (!existsSync(`${ PATH }/${ jsonManager.getSourcePath() }/${ name }`)) {
-        await exec(`git clone ${ link } ${ name }`, {
-          cwd: `${ PATH }/${ jsonManager.getSourcePath() }`
-        });
-      }
-      await exec(`git reset --hard`, {
-        cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
-      });
-      await exec(`git checkout ${ version } && git fetch ${ link } && git pull`, {
-        cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
-      });
-      const ret = await exec("git rev-parse HEAD", {
-        cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
-      });
-      const commit = ret.stdout.toString().trim();
+      const commit = await installPackage(name, link, version, commands);
       jsonManager.setDependency(name, link, version, commit, commands || "");
       jsonManager.save();
-      console.log(`Package installed: ${ name }:"${ link }"@${ version }`);
+      console.log(`Package updated: ${ name }:"${ link }"@${ version }`);
     }
 	} catch (e) {
     console.error(e);
