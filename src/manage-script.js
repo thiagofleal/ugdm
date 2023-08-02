@@ -93,7 +93,7 @@ export function createWindows(path) {
 
           ${
             getArrayFromObject(json.dependencies || {}).map(dependency => `
-              CD ${ json.source }
+              CD "${ json.source.split("/").map(e => e.replace(/\\/g, "")).join("\\") }"
               CALL git clone ${ dependency.value.link } ${ dependency.key }
               CD ${ dependency.key }
               CALL git fetch ${ dependency.value.link }
@@ -101,7 +101,7 @@ export function createWindows(path) {
               CALL git pull ${ dependency.value.link } ${ dependency.value.version }
               CALL git checkout ${ dependency.value.commit }
               ${ getCommands("win32", dependency) }
-              CD ${ mkdir.map(_ => "..").join("/") }
+              CD ${ mkdir.map(_ => "..").join("\\") }
             `.trim()).join("\n\n")
           }
         `.trim().replace(/\s+$/gm, "").replace(/^\s+/gm, "");
