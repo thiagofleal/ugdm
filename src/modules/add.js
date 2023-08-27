@@ -31,7 +31,7 @@ export async function add(name, link, version, commands) {
 				mkdirSync(mkdirPath);
 			}
 		}
-		const commit = await installPackage(name, link, version, commands);
+		const commit = await installPackage(name, link, version, void 0, commands);
 		jsonManager.setDependency(name, link, version, commit, commands || "");
 		jsonManager.save();
 		console.log(`Package added: ${ name }:"${ link }"@${ version }`);
