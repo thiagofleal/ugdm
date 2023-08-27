@@ -2,7 +2,7 @@
 
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import { init, add, remove, build } from "./modules/index.js";
+import { init, add, remove, build, install, update } from "./modules/index.js";
 
 yargs(hideBin(process.argv))
 	.scriptName("ugdm")
@@ -39,9 +39,14 @@ yargs(hideBin(process.argv))
 	.command("remove [name]", "Remove GIT dependency", {}, args => {
 		remove(args.name);
 	})
-	.command("install", "Install GIT dependencies", {}, args => {})
-	.command("build", "Generate shell script to install dependencies", {}, args => {
-		build();
+	.command("install", "Install GIT dependencies", {}, args => {
+		install();
+	})
+	.command("update [name]", "Update dependency version", {}, args => {
+		update(args.name);
+	})
+	.command("build [os]", "Generate shell script to install dependencies", {}, args => {
+		build(args.os);
 	})
 	.command("config", "Configure environment", {}, args => {})
 	.argv;
