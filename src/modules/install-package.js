@@ -22,13 +22,20 @@ export async function installPackage(name, link, version, commit, commands) {
 
   if (commit) {
     await exec(`git checkout ${ commit }`, {
-      cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
+      cwd: path
     });
   } else {
     const ret = await exec("git rev-parse HEAD", {
-      cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
+      cwd: path
     });
     commit = ret.stdout.toString().trim();
+  }
+  const isTag = await exec(`git show-ref --verify refs/tags/${ version }`, { cwd: path })
+    .then(e => e.stdout.toString() ? true : false)
+    .catch(() => false);
+  
+  if (isTag) {
+    commit = version;
   }
   if (commands) {
     let cmd = null;

@@ -41,14 +41,11 @@ export class ManageJSON {
     this.content.source = source;
   }
 
-  setDependency({ name, link, version, commit, commands, tag }) {
+  setDependency({ name, link, version, commit, commands }) {
     if (!this.content.dependencies) {
       this.content.dependencies = Object.create(null);
     }
-    if (commit && commit === version) {
-      commit = void 0;
-    }
-    this.content.dependencies[name] = removeEmptyKeys({ link, version, commit, commands, tag });
+    this.content.dependencies[name] = removeEmptyKeys({ link, version, commit, commands });
   }
 
   removeDependency(name) {
