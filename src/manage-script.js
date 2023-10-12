@@ -48,9 +48,9 @@ export async function createLinux(path) {
               cd ${ json.source }
               git clone ${ dependency.value.link } ${ dependency.key }
               cd ${ dependency.key }
-              git fetch ${ dependency.value.link } && git checkout ${ dependency.value.version }
+              git fetch ${ dependency.value.link }
               git pull ${ dependency.value.link } ${ dependency.value.version }
-              git checkout ${ dependency.value.commit }
+              git checkout ${ dependency.value.commit || dependency.value.version }
               ${ getCommands("linux", dependency) }
               cd ${ mkdir.map(_ => "..").join("/") }
             `.trim()).join("\n\n")
@@ -97,9 +97,8 @@ export function createWindows(path) {
               CALL git clone ${ dependency.value.link } ${ dependency.key }
               CD ${ dependency.key }
               CALL git fetch ${ dependency.value.link }
-              CALL git checkout ${ dependency.value.version }
               CALL git pull ${ dependency.value.link } ${ dependency.value.version }
-              CALL git checkout ${ dependency.value.commit }
+              CALL git checkout ${ dependency.value.commit || dependency.value.version }
               ${ getCommands("win32", dependency) }
               CD ${ mkdir.map(_ => "..").join("\\") }
             `.trim()).join("\n\n")

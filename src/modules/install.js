@@ -12,7 +12,7 @@ export async function install() {
   try {
     await Promise.all(getArrayFromObject(jsonManager.content.dependencies).map(async e => {
       const name = e.key;
-      let { link, version, commit, commands } = e.value;
+      let { link, version, commit, commands, tag } = e.value;
       let mkdirPath = "";
 
       for (let i = 0; i < path.length; i++) {
@@ -22,7 +22,7 @@ export async function install() {
         }
       }
   		commit = await installPackage(name, link, version, commit, commands);
-      jsonManager.setDependency({ name, link, version, commit, commands });
+      jsonManager.setDependency({ name, link, version, commit, commands, tag });
       jsonManager.save();
       console.log(`Package installed: ${ name }:"${ link }"@${ version }`);
     }));

@@ -5,19 +5,25 @@ import { exec } from "./exec.js";
 export async function installPackage(name, link, version, commit, commands) {
   jsonManager.load();
 
-  if (existsSync(`${ PATH }/${ jsonManager.getSourcePath() }/${ name }`)) {
-    await exec(`git reset --hard HEAD && git fetch ${ link }`);
+  const path = `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`;
+
+  if (existsSync(path)) {
+    await exec(`git reset --hard HEAD && git fetch ${ link }`, {
+      cwd: path
+    });
   } else {
     await exec(`git clone ${ link } ${ name }`, {
       cwd: `${ PATH }/${ jsonManager.getSourcePath() }`
     });
   }
   await exec(`git checkout ${ version }`, {
-    cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
+    cwd: path
   });
 
   if (commit) {
-    await exec(`git checkout ${ commit }`);
+    await exec(`git checkout ${ commit }`, {
+      cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
+    });
   } else {
     const ret = await exec("git rev-parse HEAD", {
       cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
