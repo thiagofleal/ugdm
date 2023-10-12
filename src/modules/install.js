@@ -22,7 +22,7 @@ export async function install() {
         }
       }
   		commit = await installPackage(name, link, version, commit, commands);
-      jsonManager.setDependency(name, link, version, commit, commands || "");
+      jsonManager.setDependency({ name, link, version, commit, commands });
       jsonManager.save();
       console.log(`Package installed: ${ name }:"${ link }"@${ version }`);
     }));
