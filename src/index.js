@@ -42,8 +42,19 @@ yargs(hideBin(process.argv))
 	.command("install", "Install GIT dependencies", {}, args => {
 		install();
 	})
-	.command("update [name]", "Update dependency version", {}, args => {
-		update(args.name);
+	.command("update [name]", "Update dependency version", {
+		tag: {
+			alias: "t",
+			description: "Use tag",
+			type: "boolean"
+		},
+		branch: {
+			alias: "b",
+			description: "Branch to get version",
+			type: "string"
+		}
+	}, args => {
+		update(args.name, args.tag, args.branch);
 	})
 	.command("build [os]", "Generate shell script to install dependencies", {}, args => {
 		build(args.os);

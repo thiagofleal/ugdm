@@ -3,6 +3,20 @@ import { join } from "path";
 
 import { jsonFileName } from "./const.js";
 
+function removeEmptyKeys(obj) {
+  if (typeof obj === "object") {
+    const ret = Object.create(null);
+
+    for (const key in obj) {
+      if (obj[key]) {
+        ret[key] = obj[key];
+      }
+    }
+    return ret;
+  }
+  return obj;
+}
+
 export class ManageJSON {
   constructor(path) {
     this.path = path || __dirname;
@@ -27,11 +41,11 @@ export class ManageJSON {
     this.content.source = source;
   }
 
-  setDependency(name, link, version, commit, commands) {
+  setDependency({ name, link, version, commit, commands }) {
     if (!this.content.dependencies) {
       this.content.dependencies = Object.create(null);
     }
-    this.content.dependencies[name] = { link, version, commit, commands };
+    this.content.dependencies[name] = removeEmptyKeys({ link, version, commit, commands });
   }
 
   removeDependency(name) {
