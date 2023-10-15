@@ -13,12 +13,12 @@ export function getArrayFromObject(obj) {
   return Object.keys(obj).map(key => ({ key, value: obj[key] }));
 }
 
-function getCommands(platform, dependency) {
-  if (typeof dependency.value.commands === "string") {
-    return dependency.value.commands;
+function getCommands(platform, commands) {
+  if (typeof commands === "string") {
+    return commands;
   }
-  if (typeof dependency.value.commands === "object") {
-    return dependency.value.commands[platform] || "";
+  if (typeof commands === "object") {
+    return commands[platform] || "";
   }
   return "";
 }
@@ -44,14 +44,14 @@ export async function createLinux(path) {
           ${ mkdir.join("\n") }
 
           ${
-            getArrayFromObject(json.dependencies || {}).map(dependency => `
+            getArrayFromObject(json.dependencies || {}).map(({ value, key }) => `
               cd ${ json.source }
-              git clone ${ dependency.value.link } ${ dependency.key }
-              cd ${ dependency.key }
-              git fetch ${ dependency.value.link }
-              git pull ${ dependency.value.link } ${ dependency.value.commit ? dependency.value.version : "--tags" }
-              git checkout ${ dependency.value.commit || dependency.value.version }
-              ${ getCommands("linux", dependency) }
+              git clone ${ value.link } ${ key }
+              cd ${ key }
+              git fetch ${ value.link }${ value.commit ? ` && git checkout ${ value.version }` : "" }
+              git pull ${ value.link } ${ value.commit ? value.version : "--tags" }
+              git checkout ${ value.commit || value.version }
+              ${ getCommands("linux", value.commands) }
               cd ${ mkdir.map(_ => "..").join("/") }
             `.trim()).join("\n\n")
           }
@@ -92,14 +92,14 @@ export function createWindows(path) {
           ${ mkdir.join("\n") }
 
           ${
-            getArrayFromObject(json.dependencies || {}).map(dependency => `
+            getArrayFromObject(json.dependencies || {}).map(({ value, key }) => `
               CD "${ json.source.split("/").map(e => e.replace(/\\/g, "")).join("\\") }"
-              CALL git clone ${ dependency.value.link } ${ dependency.key }
-              CD ${ dependency.key }
-              CALL git fetch ${ dependency.value.link }
-              CALL git pull ${ dependency.value.link } ${ dependency.value.commit ? dependency.value.version : "--tags" }
-              CALL git checkout ${ dependency.value.commit || dependency.value.version }
-              ${ getCommands("win32", dependency) }
+              CALL git clone ${ value.link } ${ key }
+              CD ${ key }
+              CALL git fetch ${ value.link }${ value.commit ? ` && git checkout ${ value.version }` : "" }
+              CALL git pull ${ value.link } ${ value.commit ? value.version : "--tags" }
+              CALL git checkout ${ value.commit || value.version }
+              ${ getCommands("win32", value.commands) }
               CD ${ mkdir.map(_ => "..").join("\\") }
             `.trim()).join("\n\n")
           }
