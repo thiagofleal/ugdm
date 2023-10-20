@@ -26,11 +26,15 @@ export async function update(name, tag, branch) {
       if (tag) {
         const cmd = `git describe --tags --abbrev=0 $(git rev-list --branches=*${ branch } --max-count=1)`;
 
-        await exec(`git pull ${ link } --tags`, {
+        await exec(`git fetch ${ link } -tap`, {
           cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
         });
         if (branch) {
-          await exec(`git switch ${ branch }`, {
+          await exec(`git switch ${ branch } && git pull --tags`, {
+            cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
+          });
+        } else {
+          await exec(`git checkout HEAD && git pull --tags`, {
             cwd: `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`
           });
         }

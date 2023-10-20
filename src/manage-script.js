@@ -39,23 +39,25 @@ export async function createLinux(path) {
         }).filter(e => e);
 
         const content = `
-          #!/bin/bash
+          #!/bin/sh
 
           ${ mkdir.join("\n") }
 
           ${
             getArrayFromObject(json.dependencies || {}).map(({ value, key }) => `
               cd ${ json.source }
-              git clone ${ value.link } ${ key }
-              cd ${ key }
-              git fetch ${ value.link }${ value.commit ? ` && git checkout ${ value.version }` : "" }
-              git pull ${ value.link } ${ value.commit ? value.version : "--tags" }
-              git checkout ${ value.commit || value.version }
+              if [ -d "${ key }" ]; then
+                {tab}git -C ${ key } fetch -tap
+                {tab}git -C ${ key } checkout ${ value.commit || value.version }
+              else
+                {tab}git clone -b ${ value.version } ${ value.link } ${ key }
+                ${ value.commit ? `{tab}git -C ${ key } checkout ${ value.commit }` : "" }
+              fi
               ${ getCommands("linux", value.commands) }
               cd ${ mkdir.map(_ => "..").join("/") }
-            `.trim()).join("\n\n")
+            `.trim()).filter(e => !!e).join("\n\n")
           }
-        `.trim().replace(/\s+$/gm, "").replace(/^\s+/gm, "");
+        `.trim().replace(/\s+$/gm, "").replace(/^\s+/gm, "").replace(/{tab}/gm, "\t");
 
         writeFileSync(shFile, content);
 
@@ -94,16 +96,18 @@ export function createWindows(path) {
           ${
             getArrayFromObject(json.dependencies || {}).map(({ value, key }) => `
               CD "${ json.source.split("/").map(e => e.replace(/\\/g, "")).join("\\") }"
-              CALL git clone ${ value.link } ${ key }
-              CD ${ key }
-              CALL git fetch ${ value.link }${ value.commit ? ` && git checkout ${ value.version }` : "" }
-              CALL git pull ${ value.link } ${ value.commit ? value.version : "--tags" }
-              CALL git checkout ${ value.commit || value.version }
+              IF EXIST ${ key } (
+                {tab}CALL git -C ${ key } fetch -tap
+                {tab}CALL git -C ${ key } checkout ${ value.commit || value.version }
+              ) ELSE (
+                {tab}CALL git clone -b ${ value.version } ${ value.link } ${ key }
+                ${ value.commit ? `{tab}CALL git -C ${ key } checkout ${ value.commit }` : "" }
+              )
               ${ getCommands("win32", value.commands) }
               CD ${ mkdir.map(_ => "..").join("\\") }
-            `.trim()).join("\n\n")
+            `.trim()).filter(e => !!e).join("\n\n")
           }
-        `.trim().replace(/\s+$/gm, "").replace(/^\s+/gm, "");
+        `.trim().replace(/\s+$/gm, "").replace(/^\s+/gm, "").replace(/{tab}/gm, "\t");
 
         writeFileSync(batchFile, content);
       }

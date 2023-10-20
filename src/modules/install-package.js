@@ -8,17 +8,14 @@ export async function installPackage(name, link, version, commit, commands) {
   const path = `${ PATH }/${ jsonManager.getSourcePath() }/${ name }`;
 
   if (existsSync(path)) {
-    await exec(`git reset --hard HEAD && git fetch ${ link }`, {
+    await exec(`git reset --hard HEAD && git fetch -tap && git checkout ${ version }`, {
       cwd: path
     });
   } else {
-    await exec(`git clone ${ link } ${ name }`, {
+    await exec(`git clone -b ${ version } ${ link } ${ name }`, {
       cwd: `${ PATH }/${ jsonManager.getSourcePath() }`
     });
   }
-  await exec(`git checkout ${ version }`, {
-    cwd: path
-  });
 
   if (commit) {
     await exec(`git checkout ${ commit }`, {
